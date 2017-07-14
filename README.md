@@ -23,7 +23,11 @@ sudo -i
 cd /usr/src/
 
 apt-get source linux-image-4.11.0-1-amd64  # change this
+```
 
+Apply patch, build package and install it:
+
+```sh
 path/to/acs_override/apply-patch.sh linux-4.11.6/
 
 dpkg -i linux-image-4.11.0-1-amd64_4.11.6-1`hostname`1_amd64.deb
