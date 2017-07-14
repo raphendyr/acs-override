@@ -1,28 +1,31 @@
---- a/Documentation/kernel-parameters.txt
-+++ b/Documentation/kernel-parameters.txt
-@@ -3049,6 +3049,16 @@
- 		nomsi	Do not use MSI for native PCIe PME signaling (this makes
- 			all PCIe root ports use INTx for all services).
+PCIe ACS Override
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2983,6 +2983,16 @@
+ 				only look for one device below a PCIe downstream
+ 				port.
  
-+	pcie_acs_override =
-+			[PCIE] Override missing PCIe ACS support for:
-+		downstream
-+			All downstream ports - full ACS capabilties
-+		multifunction
-+			All multifunction devices - multifunction ACS subset
-+		id:nnnn:nnnn
-+			Specfic device - full ACS capabilities
-+			Specified as vid:did (vendor/device ID) in hex
++        pcie_acs_override=
++                        [PCIE] Override missing PCIe ACS support for:
++                downstream
++                        All downstream ports - full ACS capabilties
++                multifunction
++                        All multifunction devices - multifunction ACS subset
++                id:nnnn:nnnn
++                        Specfic device - full ACS capabilities
++                        Specified as vid:did (vendor/device ID) in hex
 +
- 	pcmv=		[HW,PCMCIA] BadgePAD 4
- 
- 	pd_ignore_unused
+ 	pcie_aspm=	[PCIE] Forcibly enable or disable PCIe Active State Power
+ 			Management.
+ 		off	Disable ASPM.
 --- a/drivers/pci/quirks.c
 +++ b/drivers/pci/quirks.c
-@@ -3561,6 +3561,107 @@
- 	return 0;
- }
+@@ -3631,6 +3631,111 @@
+ fs_initcall_sync(pci_apply_final_quirks);
  
+ /*
++ * PCIe ACS Override
++ */
 +static bool acs_on_downstream;
 +static bool acs_on_multifunction;
 +
@@ -91,6 +94,7 @@
 +
 +	return 0;
 +}
++
 +early_param("pcie_acs_override", pcie_acs_override_setup);
 +
 +static int pcie_acs_overrides(struct pci_dev *dev, u16 acs_flags)
@@ -124,18 +128,11 @@
 +	return -ENOTTY;
 +}
 +
- /*
-  * Device-specific reset method for Chelsio T4-based adapters.
-  */
-@@ -4074,6 +4175,7 @@
- 	return acs_flags ? 0 : 1;
- }
- 
-+
- static const struct pci_dev_acs_enabled {
- 	u16 vendor;
- 	u16 device;
-@@ -4150,6 +4252,7 @@
++/*
+  * Following are device-specific reset methods which can be used to
+  * reset a single function if other methods (e.g. FLR, PM D0->D3) are
+  * not available.
+@@ -4346,6 +4451,7 @@
  	{ 0x10df, 0x720, pci_quirk_mf_endpoint_acs }, /* Emulex Skyhawk-R */
  	/* Cavium ThunderX */
  	{ PCI_VENDOR_ID_CAVIUM, PCI_ANY_ID, pci_quirk_cavium_acs },
