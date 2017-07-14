@@ -1,5 +1,7 @@
 #!/bin/sh
 
+arch=$(dpkg --print-architecture)
+
 # Resolve source location
 base=$(cd "${0%/*}" ; pwd)
 
@@ -14,7 +16,7 @@ echo "Working in directory: $PWD"
 # copy patch to kernel source
 for patchname in override_for_missing_acs_capabilities; do
 
-	cp $base/$patchname.patch debian/patches/$patchname
+	cp "$base/$patchname.patch" "debian/patches/$patchname"
 
 	if ! grep -qs $patchname debian/patches/series; then
 		cat >> debian/patches/series <<EOF
@@ -35,13 +37,13 @@ done
 #$cmd || $cmd
 dpkg-buildpackage -T clean && \
 dpkg-buildpackage -T source && \
-nice -n2 fakeroot make -j3 -f debian/rules.gen binary-arch_amd64_none && \
+nice -n2 fakeroot make -j3 -f debian/rules.gen binary-arch_${arch}_none && \
 dpkg-buildpackage -T clean
 ret=$?
 
 (
 	cd ..
-	f=$(echo linux-image-*-*_*_*.deb)
+	f=$(echo linux-image-*-${arch}_*_${arch}.deb)
 	if [ "$f" ]; then
 		for file in $f; do
 			[ -e "$file" ] && echo "run: dpkg -i $PWD/$file"
