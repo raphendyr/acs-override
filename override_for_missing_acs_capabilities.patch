@@ -1,7 +1,7 @@
 PCIe ACS Override
 --- a/Documentation/admin-guide/kernel-parameters.txt
 +++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2983,6 +2983,16 @@
+@@ -3072,6 +3072,16 @@
  				only look for one device below a PCIe downstream
  				port.
  
@@ -20,7 +20,7 @@ PCIe ACS Override
  		off	Disable ASPM.
 --- a/drivers/pci/quirks.c
 +++ b/drivers/pci/quirks.c
-@@ -3631,6 +3631,111 @@
+@@ -3674,6 +3674,111 @@
  fs_initcall_sync(pci_apply_final_quirks);
  
  /*
@@ -132,10 +132,11 @@ PCIe ACS Override
   * Following are device-specific reset methods which can be used to
   * reset a single function if other methods (e.g. FLR, PM D0->D3) are
   * not available.
-@@ -4346,6 +4451,7 @@
- 	{ 0x10df, 0x720, pci_quirk_mf_endpoint_acs }, /* Emulex Skyhawk-R */
- 	/* Cavium ThunderX */
+@@ -4505,6 +4610,8 @@
  	{ PCI_VENDOR_ID_CAVIUM, PCI_ANY_ID, pci_quirk_cavium_acs },
+ 	/* APM X-Gene */
+ 	{ PCI_VENDOR_ID_AMCC, 0xE004, pci_quirk_xgene_acs },
++	/* ACS Override */
 +	{ PCI_ANY_ID, PCI_ANY_ID, pcie_acs_overrides },
  	{ 0 }
  };

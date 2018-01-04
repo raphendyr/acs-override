@@ -41,8 +41,7 @@ export QUILT_PC=.pc
 
 dquilt new override_for_missing_acs_capabilities
 dquilt add drivers/pci/quirks.c 
-dquilt add Documentation/kernel-parameters.txt 
-dquilt add Documentation/admin-guide/kernel-parameters.tx
+dquilt add Documentation/admin-guide/kernel-parameters.txt
 patch -p1 < path/to/override.patch 
 nano drivers/pci/quirks.c # make fixes
 dquilt refresh # update patch file
