@@ -1,9 +1,9 @@
 PCIe ACS Override
 --- a/Documentation/admin-guide/kernel-parameters.txt
 +++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -3072,6 +3072,16 @@
- 				only look for one device below a PCIe downstream
- 				port.
+@@ -3238,6 +3238,16 @@
+ 				conflict with unreported devices), so this
+ 				taints the kernel.
  
 +        pcie_acs_override=
 +                        [PCIE] Override missing PCIe ACS support for:
@@ -20,7 +20,7 @@ PCIe ACS Override
  		off	Disable ASPM.
 --- a/drivers/pci/quirks.c
 +++ b/drivers/pci/quirks.c
-@@ -3674,6 +3674,111 @@
+@@ -3534,6 +3534,111 @@
  fs_initcall_sync(pci_apply_final_quirks);
  
  /*
@@ -97,7 +97,7 @@ PCIe ACS Override
 +
 +early_param("pcie_acs_override", pcie_acs_override_setup);
 +
-+static int pcie_acs_overrides(struct pci_dev *dev, u16 acs_flags)
++static int pcie_acs_override_enabled(struct pci_dev *dev, u16 acs_flags)
 +{
 +	int i;
 +
@@ -132,12 +132,15 @@ PCIe ACS Override
   * Following are device-specific reset methods which can be used to
   * reset a single function if other methods (e.g. FLR, PM D0->D3) are
   * not available.
-@@ -4505,6 +4610,8 @@
- 	{ PCI_VENDOR_ID_CAVIUM, PCI_ANY_ID, pci_quirk_cavium_acs },
- 	/* APM X-Gene */
- 	{ PCI_VENDOR_ID_AMCC, 0xE004, pci_quirk_xgene_acs },
+@@ -4426,6 +4531,11 @@
+ 		}
+ 	}
+ 
 +	/* ACS Override */
-+	{ PCI_ANY_ID, PCI_ANY_ID, pcie_acs_overrides },
- 	{ 0 }
- };
++	ret = pcie_acs_override_enabled(dev, acs_flags);
++	if (ret >= 0)
++		return ret;
++
+ 	return -ENOTTY;
+ }
  
