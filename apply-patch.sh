@@ -46,7 +46,7 @@ set +x
 
 (
 	cd ..
-	f=$(echo linux-image-*-${arch}_*_${arch}.deb)
+	f=$(echo linux-image-*-${arch}*_${arch}.deb)
 	if [ "$f" ]; then
 		for file in $f; do
 			[ -e "$file" ] && echo "run: dpkg -i $PWD/$file"
