@@ -35,11 +35,14 @@ done
 
 #cmd="nice -n2 dpkg-buildpackage -b -j3 -uc -us -tc"
 #$cmd || $cmd
+set -x
+dpkg-buildpackage -T debian/rules.gen || true
 dpkg-buildpackage -T clean && \
 dpkg-buildpackage -T source && \
 nice -n2 fakeroot make -j3 -f debian/rules.gen binary-arch_${arch}_none && \
 dpkg-buildpackage -T clean
 ret=$?
+set +x
 
 (
 	cd ..
