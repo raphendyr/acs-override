@@ -1,6 +1,7 @@
 #!/bin/sh
 
 arch=$(dpkg --print-architecture)
+ncpu=$(cat /proc/cpuinfo | grep -F processor | wc -l)
 
 # Resolve source location
 base=$(cd "${0%/*}" ; pwd)
@@ -33,13 +34,12 @@ EOF
 	fi
 done
 
-#cmd="nice -n2 dpkg-buildpackage -b -j3 -uc -us -tc"
-#$cmd || $cmd
+#nice -n2 dpkg-buildpackage -b -j3 -uc -us -tc
 set -x
 dpkg-buildpackage -T debian/rules.gen || true
 dpkg-buildpackage -T clean && \
 dpkg-buildpackage -T source && \
-nice -n2 fakeroot make -j3 -f debian/rules.gen binary-arch_${arch}_none && \
+nice -n2 fakeroot make -j$ncpu -f debian/rules.gen binary-arch_${arch}_none && \
 dpkg-buildpackage -T clean
 ret=$?
 set +x
